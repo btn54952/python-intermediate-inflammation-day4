@@ -51,7 +51,7 @@ class Doctor(Person):
     @property
     def patient_names(self):
         return[p.name for p in self.patients]
-        
+
     
 def load_csv(filename):
     """Load a Numpy array from a CSV
@@ -61,34 +61,76 @@ def load_csv(filename):
     return np.loadtxt(fname=filename, delimiter=',')
 
 
-def daily_mean(data):
-    """Calculate the daily mean of a 2D inflammation data array for each day.
+def test_daily_max():
+    """Test that max function works for an array of positive integers."""
+    from inflammation.models import daily_max
 
-    :param data: A 2D data array with inflammation data (each row contains
-                measurements for a single patient across all days).
-    :returns: An array of mean values of measurements for each day.
-    """
-    return np.mean(data, axis=0)
+    test_input = np.array([[4, 2, 5],
+                           [1, 6, 2],
+                           [4, 1, 9]])
+    test_result = np.array([4, 6, 9])
 
-
-def daily_max(data):
-    """Calculate the daily maximum of a 2D inflammation data array for each day.
-
-    :param data: A 2D data array with inflammation data (each row contains
-                measurements for a single patient across all days).
-    :returns: An array of max values of measurements for each day.
-    """
-    return np.max(data, axis=0)
+    npt.assert_array_equal(daily_max(test_input), test_result)
 
 
-def daily_min(data):
-    """Calculate the daily minimum of a 2D inflammation data array for each day.
+def test_daily_min():
+    """Test that min function works for an array of positive and negative integers."""
+    from inflammation.models import daily_min
 
-    :param data: A 2D data array with inflammation data (each row contains
-                measurements for a single patient across all days).
-    :returns: An array of minimum values of measurements for each day.
-    """
-    return np.min(data, axis=0)
+    test_input = np.array([[ 4, -2, 5],
+                           [ 1, -6, 2],
+                           [-4, -1, 9]])
+    test_result = np.array([-4, -6, 2])
+
+    npt.assert_array_equal(daily_min(test_input), test_result)
+
+@pytest.mark.parametrize(
+    "test, expected",
+    [
+        ([[0, 0], [0, 0], [0, 0]], [0, 0]),
+        ([[1, 2], [3, 4], [5, 6]], [3, 4]),
+    ]
+)
+def test_daily_mean(test, expected):
+    """Test that mean function works for an array of zeros."""
+    from inflammation.models import daily_mean
+
+    # Need to use Numpy testing functions to compare arrays
+    npt.assert_array_equal(daily_mean(test), expected)
+
+def test_daily_min_string():
+    '''Test for TypeError when we pass a string'''
+    from inflammation.models import daily_min
+
+    with pytest.raises(TypeError):
+        error_expected = daily_min([['abd', 'ads'], ['asd', 'auhs']])
+
+@pytest.mark.parametrize(
+    "test, expected",
+    [
+        ([[0, 0, 0], [0, 0, 0], [0, 0, 0]], [0, 0, 0]),
+        ([[4, 2, 5], [1, 6, 2], [4, 1, 9]], [4, 6, 9]),
+        ([[4, -2, 5], [1, -6, 2], [-4, -1, 9]], [4, -1, 9]),
+    ])
+def test_daily_max(test, expected):
+    """Test that max function works for an array of positive integers."""
+    from inflammation.models import daily_max
+
+    npt.assert_array_equal(daily_max(test), expected)
+
+
+@pytest.mark.parametrize(
+    "test, expected",
+    [
+        ([[0, 0, 0], [0, 0, 0], [0, 0, 0]], [0, 0, 0]),
+        ([[4, 2, 5], [1, 6, 2], [4, 1, 9]], [1, 1, 2]),
+        ([[4, -2, 5], [1, -6, 2], [-4, -1, 9]], [-4, -6, 2]),
+    ])
+def test_daily_min(test, expected):
+    """Test that min function works for an array of positive and negative integers."""
+    from inflammation.models import daily_min
+
+    npt.assert_array_equal(daily_min(test), expected)
 
 if __name__ == "__main__":
     p = Patient("Harry")
