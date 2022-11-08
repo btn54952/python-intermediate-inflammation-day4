@@ -31,7 +31,7 @@ def test_daily_mean_integers():
 
 
 def test_daily_std_integers():
-    """Test that mean function works for an array of positive integers."""
+    """Test that std_integers function works for an array of positive integers."""
     from inflammation.models import daily_mean
 
     test_input = np.array([[1, 2],
